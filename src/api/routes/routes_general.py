@@ -7,6 +7,7 @@ from flask_cors import CORS, cross_origin
 from api.utils.responses import response_with
 from api.utils import responses as resp
 from api.models.model_author import Author, AuthorSchema
+import collections
 import requests
 from bs4 import BeautifulSoup
 import os
@@ -17,9 +18,10 @@ import sys
 route_path_general = Blueprint("route_path_general", __name__)
 CORS(route_path_general)
 
-@route_path_general.route('/v1.0/goal', methods=['POST'])
+@route_path_general.route('/v1.0/goal')
 def getdata():
-    try:
+    #try:
+        ls = []
         goal_one = request.headers['goal']
         goal = 'how to ' + goal_one
         goal += ' wikihow'
@@ -52,6 +54,11 @@ def getdata():
                 for j in s.findAll("ul"):
                     for r in j.findAll("li"):
                         data = data + " " + r.get_text()
-        return response_with(resp.SUCCESS_200, value={"data": data})
-    except Exception:
-        return response_with(resp.INVALID_INPUT_422)
+                dictionary_of_json = collections.defaultdict(dict)
+                dictionary_of_json['item'] = data
+                dictionary_updated = dict(dictionary_of_json)
+                ls.append(dictionary_updated)
+                data = ""
+        return response_with(resp.SUCCESS_200, value={"data": ls})
+    #except Exception:
+        #return response_with(resp.INVALID_INPUT_422)
